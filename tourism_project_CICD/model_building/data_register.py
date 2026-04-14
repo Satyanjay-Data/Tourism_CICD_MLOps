@@ -6,20 +6,37 @@ import os
 repo_id = "Satyanjay/tourism-package-prediction-CICD"
 repo_type = "dataset"
 
-# Initialize API client
-api = HfApi(token=os.getenv("HF_TOKEN"))
+# 🔹 Get token
+token = os.getenv("HF_TOKEN")
 
-# Step 1: Check if the space exists
+if token is None:
+    raise ValueError("❌ HF_TOKEN is missing! Add it to GitHub Secrets.")
+
+# 🔹 Initialize API
+api = HfApi(token=token)
+
+# 🔹 Check if dataset exists
 try:
     api.repo_info(repo_id=repo_id, repo_type=repo_type)
-    print(f"Space '{repo_id}' already exists. Using it.")
-except RepositoryNotFoundError:
-    print(f"Space '{repo_id}' not found. Creating new space...")
-    create_repo(repo_id=repo_id, repo_type=repo_type, private=False)
-    print(f"Space '{repo_id}' created.")
+    print(f"✅ Dataset '{repo_id}' already exists.")
 
+except RepositoryNotFoundError:
+    print(f"⚠️ Dataset '{repo_id}' not found. Creating...")
+
+    create_repo(
+        repo_id=repo_id,
+        repo_type=repo_type,
+        private=False,
+        token=token   # ✅ CRITICAL FIX
+    )
+
+    print(f"✅ Dataset '{repo_id}' created.")
+
+# 🔹 Upload folder
 api.upload_folder(
     folder_path="tourism_project_CICD/data",
     repo_id=repo_id,
     repo_type=repo_type,
 )
+
+print("✅ Upload completed successfully.")
