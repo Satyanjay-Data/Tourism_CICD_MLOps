@@ -1,7 +1,9 @@
 name: Tourism Package Prediction
 
 on:
-  workflow_dispatch:
+  push:
+    branches:
+      - main  # Automatically triggers on push to the main branch
 
 jobs:
 
@@ -47,7 +49,7 @@ jobs:
       - name: Run training pipeline
         env:
           HF_TOKEN: ${{ secrets.HF_TOKEN }}
-        run: python tourism_project_CICD/train.py
+        run: python tourism_project_CICD/model_building/train.py
 
   deploy-hosting:
     runs-on: ubuntu-latest
